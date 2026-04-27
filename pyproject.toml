@@ -1,0 +1,44 @@
+[project]
+name = "f1-data-lakehouse"
+version = "0.1.0"
+description = "F1 Data Lakehouse - A Human-in-the-Loop AI data engineering project on GCP"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [{name = "Jowin Jestine", email = "jjestine@myolaris.com"}]
+
+dependencies = [
+    "fastf1>=3.4.0",
+    "google-cloud-storage>=2.14.0",
+    "google-cloud-bigquery>=3.17.0",
+    "pyarrow>=15.0.0",
+    "pyyaml>=6.0.1",
+    "pandas>=2.2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.3.0",
+    "pre-commit>=3.6.0",
+]
+dbt = [
+    "dbt-core>=1.8.0",
+    "dbt-bigquery>=1.8.0",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "unit: Unit tests with mocked dependencies",
+    "integration: Integration tests against real APIs",
+]
+addopts = "--strict-markers -v"
