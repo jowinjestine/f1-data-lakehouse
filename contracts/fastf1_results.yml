@@ -1,0 +1,16 @@
+name: fastf1_results
+source: fastf1
+dataset: results
+schema_version: "1.0"
+required_columns:
+  - name: driver_number
+    type: string
+  - name: position
+    type: float64
+    nullable: true
+  - name: points
+    type: float64
+    nullable: true
+  - name: status
+    type: string
+    nullable: true

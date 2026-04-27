@@ -1,0 +1,10 @@
+name: jolpica_qualifying
+source: jolpica
+dataset: qualifying
+schema_version: "1.0"
+required_columns:
+  - name: driverId
+    type: string
+  - name: position
+    type: float64
+    nullable: true

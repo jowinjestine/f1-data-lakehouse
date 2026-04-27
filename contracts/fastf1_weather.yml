@@ -1,0 +1,23 @@
+name: fastf1_weather
+source: fastf1
+dataset: weather
+schema_version: "1.0"
+required_columns:
+  - name: air_temp
+    type: float64
+    nullable: true
+  - name: track_temp
+    type: float64
+    nullable: true
+  - name: humidity
+    type: float64
+    nullable: true
+  - name: wind_speed
+    type: float64
+    nullable: true
+  - name: wind_direction
+    type: float64
+    nullable: true
+  - name: rainfall
+    type: bool
+    nullable: true
