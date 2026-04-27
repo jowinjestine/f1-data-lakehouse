@@ -1,0 +1,49 @@
+version: 2
+
+models:
+  - name: dim_drivers
+    description: Driver dimension with entity resolution via crosswalk
+    columns:
+      - name: driver_key
+        description: Normalized driver identifier
+        tests: [not_null]
+
+  - name: dim_constructors
+    description: Constructor dimension with entity resolution via crosswalk
+    columns:
+      - name: constructor_key
+        tests: [not_null]
+
+  - name: dim_circuits
+    description: Circuit dimension with entity resolution via crosswalk
+    columns:
+      - name: circuit_key
+        tests: [not_null]
+
+  - name: fct_race_results
+    description: Unified race results from FastF1 (2018+) and Jolpica (1950-2017)
+    columns:
+      - name: result_id
+        tests: [not_null]
+      - name: data_source
+        tests:
+          - accepted_values:
+              values: ['fastf1', 'jolpica']
+
+  - name: fct_lap_analysis
+    description: Lap-level analysis with weather data (FastF1 only, 2018+)
+    columns:
+      - name: lap_id
+        tests: [unique, not_null]
+
+  - name: fct_qualifying
+    description: Qualifying results with gap to pole (Jolpica, 2003+)
+    columns:
+      - name: qualifying_id
+        tests: [unique, not_null]
+
+  - name: fct_pitstops
+    description: Pit stop data (Jolpica, 2011+)
+    columns:
+      - name: pitstop_id
+        tests: [unique, not_null]

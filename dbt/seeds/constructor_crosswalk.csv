@@ -1,0 +1,16 @@
+source,source_id,normalized_id,source_name,normalized_name,valid_from,valid_to,notes
+jolpica,red_bull,red_bull,Red Bull,Red Bull Racing,2005,,
+jolpica,mercedes,mercedes,Mercedes,Mercedes-AMG Petronas,2010,,
+jolpica,ferrari,ferrari,Ferrari,Scuderia Ferrari,1950,,
+jolpica,mclaren,mclaren,McLaren,McLaren F1 Team,1966,,
+jolpica,aston_martin,aston_martin,Aston Martin,Aston Martin Aramco,2021,,
+jolpica,alpine,alpine,Alpine F1 Team,Alpine F1 Team,2021,,
+jolpica,renault,alpine,Renault,Alpine F1 Team,2016,2020,Rebranded to Alpine in 2021
+jolpica,williams,williams,Williams,Williams Racing,1977,,
+jolpica,alphatauri,rb,AlphaTauri,RB F1 Team,2020,2023,Rebranded to RB in 2024
+jolpica,rb,rb,RB F1 Team,RB F1 Team,2024,,
+jolpica,haas,haas,Haas F1 Team,MoneyGram Haas F1 Team,2016,,
+jolpica,sauber,sauber,Sauber,Stake F1 Team Kick Sauber,1993,,
+jolpica,racing_point,aston_martin,Racing Point,Aston Martin Aramco,2019,2020,Became Aston Martin in 2021
+jolpica,force_india,aston_martin,Force India,Aston Martin Aramco,2008,2018,Became Racing Point then Aston Martin
+jolpica,toro_rosso,rb,Toro Rosso,RB F1 Team,2006,2019,Became AlphaTauri then RB

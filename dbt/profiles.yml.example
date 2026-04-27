@@ -1,0 +1,24 @@
+f1_lakehouse:
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: "{{ env_var('GCP_PROJECT') }}"
+      dataset: f1_staging
+      threads: 4
+      timeout_seconds: 300
+      location: US
+      priority: interactive
+      maximum_bytes_billed: 1000000000  # 1 GB guard
+
+    prod:
+      type: bigquery
+      method: oauth
+      project: "{{ env_var('GCP_PROJECT') }}"
+      dataset: f1_staging
+      threads: 4
+      timeout_seconds: 300
+      location: US
+      priority: interactive
+
+  target: dev
