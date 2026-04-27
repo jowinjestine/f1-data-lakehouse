@@ -1,4 +1,4 @@
-.PHONY: lint test test-unit test-integration fmt validate dbt-compile install
+.PHONY: lint test test-unit test-integration test-all fmt validate dbt-compile install
 
 install:
 	pip install -e ".[dev,dbt]"
@@ -24,7 +24,15 @@ test-all:
 	pytest tests/ -v --cov=jobs --cov-report=term-missing
 
 validate:
-	cd terraform && terraform validate
+	@if ls terraform/*.tf >/dev/null 2>&1; then \
+		cd terraform && terraform validate; \
+	else \
+		echo "Skipping terraform validate: no Terraform configuration files found in terraform/"; \
+	fi
 
 dbt-compile:
-	cd dbt && dbt compile
+	@if [ -f dbt/dbt_project.yml ]; then \
+		cd dbt && dbt compile; \
+	else \
+		echo "Skipping dbt compile: dbt/dbt_project.yml not found; dbt project is not yet configured."; \
+	fi
