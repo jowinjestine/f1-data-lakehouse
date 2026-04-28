@@ -33,7 +33,7 @@ dbt = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["jobs*", "tests*"]
+include = ["jobs*"]
 
 [tool.ruff]
 target-version = "py312"
