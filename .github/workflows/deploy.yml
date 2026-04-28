@@ -1,0 +1,87 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      job_to_run:
+        description: "Job to trigger manually (backfill_jolpica, backfill_fastf1, or leave empty for full deploy)"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+  REGION: us-central1
+  AR_REPO: f1-lakehouse
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.DEPLOY_SA_EMAIL }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.6.0"
+
+      - name: Terraform init
+        run: cd terraform && terraform init
+
+      - name: Terraform apply
+        run: cd terraform && terraform apply -auto-approve
+        if: github.event_name == 'push'
+
+      - name: Build and push ingest-recent image
+        run: |
+          gcloud builds submit \
+            --tag ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO }}/ingest-recent:latest \
+            --project ${{ env.PROJECT_ID }} \
+            jobs/ingest_recent/
+
+      - name: Build and push backfill-jolpica image
+        run: |
+          gcloud builds submit \
+            --tag ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO }}/backfill-jolpica:latest \
+            --project ${{ env.PROJECT_ID }} \
+            jobs/backfill_jolpica/
+
+      - name: Build and push dbt-runner image
+        run: |
+          gcloud builds submit \
+            --tag ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO }}/dbt-runner:latest \
+            --project ${{ env.PROJECT_ID }} \
+            jobs/dbt_runner/
+
+  manual-job:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.job_to_run != ''
+    steps:
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.DEPLOY_SA_EMAIL }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Trigger Cloud Run Job
+        run: |
+          gcloud run jobs execute f1-${{ github.event.inputs.job_to_run }} \
+            --region ${{ env.REGION }} \
+            --project ${{ env.PROJECT_ID }} \
+            --wait
