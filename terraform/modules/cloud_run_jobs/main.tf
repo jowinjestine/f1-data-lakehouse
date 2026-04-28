@@ -1,3 +1,8 @@
+locals {
+  placeholder_image = "gcr.io/cloudrun/hello:latest"
+  ar_base           = "${var.region}-docker.pkg.dev/${var.project_id}/${var.ar_repository_id}"
+}
+
 resource "google_cloud_run_v2_job" "ingest_recent" {
   name     = "f1-ingest-recent"
   location = var.region
@@ -6,7 +11,7 @@ resource "google_cloud_run_v2_job" "ingest_recent" {
   template {
     template {
       containers {
-        image = "${var.region}-docker.pkg.dev/${var.project_id}/${var.ar_repository_id}/ingest-recent:latest"
+        image = var.use_placeholder_image ? local.placeholder_image : "${local.ar_base}/ingest-recent:latest"
 
         env {
           name  = "GCP_PROJECT"
@@ -42,7 +47,7 @@ resource "google_cloud_run_v2_job" "backfill_jolpica" {
   template {
     template {
       containers {
-        image = "${var.region}-docker.pkg.dev/${var.project_id}/${var.ar_repository_id}/backfill-jolpica:latest"
+        image = var.use_placeholder_image ? local.placeholder_image : "${local.ar_base}/backfill-jolpica:latest"
 
         env {
           name  = "GCP_PROJECT"
@@ -78,7 +83,7 @@ resource "google_cloud_run_v2_job" "backfill_fastf1" {
   template {
     template {
       containers {
-        image = "${var.region}-docker.pkg.dev/${var.project_id}/${var.ar_repository_id}/backfill-fastf1:latest"
+        image = var.use_placeholder_image ? local.placeholder_image : "${local.ar_base}/backfill-fastf1:latest"
 
         env {
           name  = "GCP_PROJECT"
@@ -114,7 +119,7 @@ resource "google_cloud_run_v2_job" "dbt_runner" {
   template {
     template {
       containers {
-        image = "${var.region}-docker.pkg.dev/${var.project_id}/${var.ar_repository_id}/dbt-runner:latest"
+        image = var.use_placeholder_image ? local.placeholder_image : "${local.ar_base}/dbt-runner:latest"
 
         env {
           name  = "GCP_PROJECT"
