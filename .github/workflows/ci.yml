@@ -64,8 +64,8 @@ jobs:
       - name: dbt deps
         run: cd dbt && dbt deps
 
-      - name: dbt compile
-        run: cd dbt && dbt compile --target dev
+      - name: dbt parse
+        run: cd dbt && dbt parse --target dev
         env:
           GCP_PROJECT: "placeholder"
           RAW_BUCKET: "placeholder"
