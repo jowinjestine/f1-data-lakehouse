@@ -1,5 +1,6 @@
-import pytest
 from unittest.mock import patch
+
+import pytest
 
 from jobs.ingest_recent.jolpica_client import _rate_limit
 

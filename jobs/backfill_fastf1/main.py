@@ -3,10 +3,9 @@ import logging
 import os
 import sys
 
+from jobs.backfill_jolpica.checkpoint import get_checkpoint, save_checkpoint
 from jobs.ingest_recent import fastf1_client, gcs_writer, manifest, schema_contracts
 from jobs.ingest_recent.config import SCHEMA_VERSION, generate_ingest_run_id
-
-from jobs.backfill_jolpica.checkpoint import get_checkpoint, save_checkpoint
 
 logging.basicConfig(
     level=logging.INFO,
@@ -27,6 +26,7 @@ SESSION_TYPES = ["R", "Q"]
 
 def _get_rounds_for_season(year: int) -> list[int]:
     import fastf1
+
     schedule = fastf1.get_event_schedule(year)
     return [int(row["RoundNumber"]) for _, row in schedule.iterrows() if row["RoundNumber"] > 0]
 
@@ -62,28 +62,62 @@ def run() -> None:
 
                 for dataset_name, df in datasets.items():
                     if DRY_RUN:
-                        logger.info("[DRY RUN] Would write %s %d R%02d %s (%d rows)", dataset_name, year, round_num, session_type, len(df))
+                        logger.info(
+                            "[DRY RUN] Would write %s %d R%02d %s (%d rows)",
+                            dataset_name,
+                            year,
+                            round_num,
+                            session_type,
+                            len(df),
+                        )
                         stats["skipped"] += 1
                         continue
 
                     result = schema_contracts.validate(df, "fastf1", dataset_name)
                     if not result.valid:
                         gcs_writer.write_quarantine(
-                            RAW_BUCKET, schema_contracts.format_quarantine_error("fastf1", dataset_name, result),
-                            "fastf1", dataset_name, year, round_num, ingest_run_id,
+                            RAW_BUCKET,
+                            schema_contracts.format_quarantine_error("fastf1", dataset_name, result),
+                            "fastf1",
+                            dataset_name,
+                            year,
+                            round_num,
+                            ingest_run_id,
                         )
                         stats["errors"] += 1
                         continue
 
                     gcs_uri, row_count = gcs_writer.write_parquet(
-                        RAW_BUCKET, df, "fastf1", dataset_name, year, round_num, session_type, ingest_run_id,
+                        RAW_BUCKET,
+                        df,
+                        "fastf1",
+                        dataset_name,
+                        year,
+                        round_num,
+                        session_type,
+                        ingest_run_id,
                     )
                     manifest.log_ingest_object(
-                        ingest_run_id, "fastf1", dataset_name, year, round_num, session_type,
-                        "success", row_count, gcs_uri, SCHEMA_VERSION,
+                        ingest_run_id,
+                        "fastf1",
+                        dataset_name,
+                        year,
+                        round_num,
+                        session_type,
+                        "success",
+                        row_count,
+                        gcs_uri,
+                        SCHEMA_VERSION,
                     )
                     manifest.update_latest_successful_object(
-                        "fastf1", dataset_name, year, round_num, session_type, ingest_run_id, gcs_uri, row_count,
+                        "fastf1",
+                        dataset_name,
+                        year,
+                        round_num,
+                        session_type,
+                        ingest_run_id,
+                        gcs_uri,
+                        row_count,
                     )
                     stats["files_written"] += 1
                     stats["rows_ingested"] += row_count

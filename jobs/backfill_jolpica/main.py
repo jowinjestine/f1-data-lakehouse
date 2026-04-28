@@ -38,6 +38,7 @@ DATASET_CONFIGS = {
 def _get_rounds_for_season(year: int) -> list[int]:
     try:
         from fastf1.ergast import Ergast
+
         ergast = Ergast()
         schedule = ergast.get_race_schedule(season=year)
         if schedule.content and len(schedule.content[0]) > 0:
@@ -81,28 +82,61 @@ def run() -> None:
                         continue
 
                     if DRY_RUN:
-                        logger.info("[DRY RUN] Would write %s %d R%02d (%d rows)", dataset_name, year, round_num, len(df))
+                        logger.info(
+                            "[DRY RUN] Would write %s %d R%02d (%d rows)",
+                            dataset_name,
+                            year,
+                            round_num,
+                            len(df),
+                        )
                         stats["skipped"] += 1
                         continue
 
                     result = schema_contracts.validate(df, "jolpica", dataset_name)
                     if not result.valid:
                         gcs_writer.write_quarantine(
-                            RAW_BUCKET, schema_contracts.format_quarantine_error("jolpica", dataset_name, result),
-                            "jolpica", dataset_name, year, round_num, ingest_run_id,
+                            RAW_BUCKET,
+                            schema_contracts.format_quarantine_error("jolpica", dataset_name, result),
+                            "jolpica",
+                            dataset_name,
+                            year,
+                            round_num,
+                            ingest_run_id,
                         )
                         stats["errors"] += 1
                         continue
 
                     gcs_uri, row_count = gcs_writer.write_parquet(
-                        RAW_BUCKET, df, "jolpica", dataset_name, year, round_num, None, ingest_run_id,
+                        RAW_BUCKET,
+                        df,
+                        "jolpica",
+                        dataset_name,
+                        year,
+                        round_num,
+                        None,
+                        ingest_run_id,
                     )
                     manifest.log_ingest_object(
-                        ingest_run_id, "jolpica", dataset_name, year, round_num, None,
-                        "success", row_count, gcs_uri, SCHEMA_VERSION,
+                        ingest_run_id,
+                        "jolpica",
+                        dataset_name,
+                        year,
+                        round_num,
+                        None,
+                        "success",
+                        row_count,
+                        gcs_uri,
+                        SCHEMA_VERSION,
                     )
                     manifest.update_latest_successful_object(
-                        "jolpica", dataset_name, year, round_num, None, ingest_run_id, gcs_uri, row_count,
+                        "jolpica",
+                        dataset_name,
+                        year,
+                        round_num,
+                        None,
+                        ingest_run_id,
+                        gcs_uri,
+                        row_count,
                     )
                     stats["files_written"] += 1
                     stats["rows_ingested"] += row_count
@@ -125,14 +159,36 @@ def run() -> None:
                     continue
 
                 gcs_uri, row_count = gcs_writer.write_parquet(
-                    RAW_BUCKET, df, "jolpica", dataset_name, year, None, None, ingest_run_id,
+                    RAW_BUCKET,
+                    df,
+                    "jolpica",
+                    dataset_name,
+                    year,
+                    None,
+                    None,
+                    ingest_run_id,
                 )
                 manifest.log_ingest_object(
-                    ingest_run_id, "jolpica", dataset_name, year, None, None,
-                    "success", row_count, gcs_uri, SCHEMA_VERSION,
+                    ingest_run_id,
+                    "jolpica",
+                    dataset_name,
+                    year,
+                    None,
+                    None,
+                    "success",
+                    row_count,
+                    gcs_uri,
+                    SCHEMA_VERSION,
                 )
                 manifest.update_latest_successful_object(
-                    "jolpica", dataset_name, year, None, None, ingest_run_id, gcs_uri, row_count,
+                    "jolpica",
+                    dataset_name,
+                    year,
+                    None,
+                    None,
+                    ingest_run_id,
+                    gcs_uri,
+                    row_count,
                 )
                 stats["files_written"] += 1
                 stats["rows_ingested"] += row_count

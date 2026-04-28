@@ -1,6 +1,6 @@
 import logging
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import fastf1
 import pandas as pd
@@ -29,7 +29,7 @@ def _normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _add_metadata(df: pd.DataFrame) -> pd.DataFrame:
-    df["ingestion_timestamp"] = datetime.now(timezone.utc).isoformat()
+    df["ingestion_timestamp"] = datetime.now(UTC).isoformat()
     df["schema_version"] = SCHEMA_VERSION
     return df
 

@@ -31,23 +31,62 @@ def _ingest_fastf1_session(
         result = schema_contracts.validate(df, "fastf1", dataset_name)
         if not result.valid:
             error_json = schema_contracts.format_quarantine_error("fastf1", dataset_name, result)
-            gcs_writer.write_quarantine(RAW_BUCKET, error_json, "fastf1", dataset_name, year, round_number, ingest_run_id)
+            gcs_writer.write_quarantine(
+                RAW_BUCKET,
+                error_json,
+                "fastf1",
+                dataset_name,
+                year,
+                round_number,
+                ingest_run_id,
+            )
             manifest.log_ingest_object(
-                ingest_run_id, "fastf1", dataset_name, year, round_number, session_type,
-                "quarantined", 0, "", SCHEMA_VERSION, error_message="; ".join(result.errors),
+                ingest_run_id,
+                "fastf1",
+                dataset_name,
+                year,
+                round_number,
+                session_type,
+                "quarantined",
+                0,
+                "",
+                SCHEMA_VERSION,
+                error_message="; ".join(result.errors),
             )
             stats["quarantined"] += 1
             continue
 
         gcs_uri, row_count = gcs_writer.write_parquet(
-            RAW_BUCKET, df, "fastf1", dataset_name, year, round_number, session_type, ingest_run_id,
+            RAW_BUCKET,
+            df,
+            "fastf1",
+            dataset_name,
+            year,
+            round_number,
+            session_type,
+            ingest_run_id,
         )
         manifest.log_ingest_object(
-            ingest_run_id, "fastf1", dataset_name, year, round_number, session_type,
-            "success", row_count, gcs_uri, SCHEMA_VERSION,
+            ingest_run_id,
+            "fastf1",
+            dataset_name,
+            year,
+            round_number,
+            session_type,
+            "success",
+            row_count,
+            gcs_uri,
+            SCHEMA_VERSION,
         )
         manifest.update_latest_successful_object(
-            "fastf1", dataset_name, year, round_number, session_type, ingest_run_id, gcs_uri, row_count,
+            "fastf1",
+            dataset_name,
+            year,
+            round_number,
+            session_type,
+            ingest_run_id,
+            gcs_uri,
+            row_count,
         )
         stats["files_written"] += 1
         stats["rows_ingested"] += row_count
@@ -80,19 +119,49 @@ def _ingest_jolpica_round(
         result = schema_contracts.validate(df, "jolpica", dataset_name)
         if not result.valid:
             error_json = schema_contracts.format_quarantine_error("jolpica", dataset_name, result)
-            gcs_writer.write_quarantine(RAW_BUCKET, error_json, "jolpica", dataset_name, year, round_number, ingest_run_id)
+            gcs_writer.write_quarantine(
+                RAW_BUCKET,
+                error_json,
+                "jolpica",
+                dataset_name,
+                year,
+                round_number,
+                ingest_run_id,
+            )
             stats["quarantined"] += 1
             continue
 
         gcs_uri, row_count = gcs_writer.write_parquet(
-            RAW_BUCKET, df, "jolpica", dataset_name, year, round_number, None, ingest_run_id,
+            RAW_BUCKET,
+            df,
+            "jolpica",
+            dataset_name,
+            year,
+            round_number,
+            None,
+            ingest_run_id,
         )
         manifest.log_ingest_object(
-            ingest_run_id, "jolpica", dataset_name, year, round_number, None,
-            "success", row_count, gcs_uri, SCHEMA_VERSION,
+            ingest_run_id,
+            "jolpica",
+            dataset_name,
+            year,
+            round_number,
+            None,
+            "success",
+            row_count,
+            gcs_uri,
+            SCHEMA_VERSION,
         )
         manifest.update_latest_successful_object(
-            "jolpica", dataset_name, year, round_number, None, ingest_run_id, gcs_uri, row_count,
+            "jolpica",
+            dataset_name,
+            year,
+            round_number,
+            None,
+            ingest_run_id,
+            gcs_uri,
+            row_count,
         )
         stats["files_written"] += 1
         stats["rows_ingested"] += row_count

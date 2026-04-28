@@ -48,8 +48,10 @@ def validate(df: pd.DataFrame, source: str, dataset: str) -> ValidationResult:
 
 
 def format_quarantine_error(source: str, dataset: str, result: ValidationResult) -> str:
-    return json.dumps({
-        "source": source,
-        "dataset": dataset,
-        "errors": result.errors,
-    })
+    return json.dumps(
+        {
+            "source": source,
+            "dataset": dataset,
+            "errors": result.errors,
+        }
+    )

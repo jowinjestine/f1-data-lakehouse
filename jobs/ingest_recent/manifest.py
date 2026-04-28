@@ -1,6 +1,6 @@
 import hashlib
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from google.cloud import bigquery
 
@@ -23,15 +23,17 @@ def log_ingest_run(
     client = _get_client()
     table_id = f"{GCP_PROJECT}.{BQ_OPS_DATASET}.ingest_runs"
 
-    rows = [{
-        "run_id": run_id,
-        "source": source,
-        "start_time": datetime.now(timezone.utc).isoformat(),
-        "end_time": datetime.now(timezone.utc).isoformat(),
-        "status": status,
-        "datasets_processed": datasets_processed,
-        "error_message": error_message,
-    }]
+    rows = [
+        {
+            "run_id": run_id,
+            "source": source,
+            "start_time": datetime.now(UTC).isoformat(),
+            "end_time": datetime.now(UTC).isoformat(),
+            "status": status,
+            "datasets_processed": datasets_processed,
+            "error_message": error_message,
+        }
+    ]
 
     errors = client.insert_rows_json(table_id, rows)
     if errors:
@@ -58,21 +60,23 @@ def log_ingest_object(
 
     checksum = hashlib.md5(gcs_uri.encode()).hexdigest()
 
-    rows = [{
-        "run_id": run_id,
-        "source": source,
-        "dataset": dataset,
-        "year": year,
-        "round": round_number,
-        "session_type": session_type,
-        "status": status,
-        "row_count": row_count,
-        "gcs_uri": gcs_uri,
-        "checksum": checksum,
-        "schema_version": schema_version,
-        "error_message": error_message,
-        "logged_at": datetime.now(timezone.utc).isoformat(),
-    }]
+    rows = [
+        {
+            "run_id": run_id,
+            "source": source,
+            "dataset": dataset,
+            "year": year,
+            "round": round_number,
+            "session_type": session_type,
+            "status": status,
+            "row_count": row_count,
+            "gcs_uri": gcs_uri,
+            "checksum": checksum,
+            "schema_version": schema_version,
+            "error_message": error_message,
+            "logged_at": datetime.now(UTC).isoformat(),
+        }
+    ]
 
     errors = client.insert_rows_json(table_id, rows)
     if errors:
@@ -109,7 +113,8 @@ def update_latest_successful_object(
     WHEN NOT MATCHED THEN INSERT
         (source, dataset, year, round, session_type, latest_ingest_run_id, gcs_uri, row_count, checksum, updated_at)
     VALUES
-        (@source, @dataset, @year, @round, @session_type, @ingest_run_id, @gcs_uri, @row_count, @checksum, CURRENT_TIMESTAMP())
+        (@source, @dataset, @year, @round, @session_type, @ingest_run_id,
+         @gcs_uri, @row_count, @checksum, CURRENT_TIMESTAMP())
     """
 
     job_config = bigquery.QueryJobConfig(
