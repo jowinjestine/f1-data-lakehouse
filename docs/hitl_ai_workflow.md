@@ -43,7 +43,7 @@ This project follows a **Human-in-the-Loop (HITL) AI** delivery model. AI agents
 - Merge PRs without CI passing and human approval
 - Create or rotate secrets or credentials
 
-## 7-Phase Delivery Model
+## 8-Phase Delivery Model
 
 Each phase has a **human review gate** that must be passed before proceeding.
 
