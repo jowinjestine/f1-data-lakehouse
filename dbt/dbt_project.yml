@@ -1,0 +1,33 @@
+name: 'f1_lakehouse'
+version: '1.0.0'
+config-version: 2
+
+profile: 'f1_lakehouse'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+asset-paths: ["assets"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  f1_lakehouse:
+    staging:
+      +materialized: view
+      +schema: staging
+    marts:
+      +materialized: table
+      +schema: analytics
+    ops:
+      +materialized: view
+      +schema: ops
+
+seeds:
+  f1_lakehouse:
+    +schema: analytics

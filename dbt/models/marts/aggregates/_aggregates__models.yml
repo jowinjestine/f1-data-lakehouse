@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: agg_season_standings
+    description: Season standings with cumulative points and normalized metrics
+
+  - name: agg_constructor_standings
+    description: Constructor championship standings by season
+
+  - name: agg_career_stats
+    description: Career statistics per driver (wins, poles, podiums, points_share, wins_per_start)
+
+  - name: agg_era_comparison
+    description: Aggregate statistics by F1 era (1950-70, 71-93, 94-2013, 14-21, 22+)
+
+  - name: agg_head_to_head
+    description: Teammate comparison within same constructor per season
