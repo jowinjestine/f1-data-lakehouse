@@ -1,0 +1,7 @@
+project_id      = "your-gcp-project-id"
+billing_account = "XXXXXX-XXXXXX-XXXXXX"
+region          = "us-central1"
+bq_location     = "US"
+alert_email     = "jjestine@myolaris.com"
+budget_amounts  = [0.50, 1.00, 5.00]
+github_repo     = "jowinjestine/f1-data-lakehouse"
