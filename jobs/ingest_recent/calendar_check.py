@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import fastf1
 
@@ -16,7 +16,7 @@ class RecentEvent:
 
 
 def get_recent_events(lookback_days: int = 7) -> list[RecentEvent]:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     cutoff = now - timedelta(days=lookback_days)
     current_year = now.year
 
@@ -31,7 +31,7 @@ def get_recent_events(lookback_days: int = 7) -> list[RecentEvent]:
         if hasattr(event_date, "to_pydatetime"):
             event_date = event_date.to_pydatetime()
         if event_date.tzinfo is None:
-            event_date = event_date.replace(tzinfo=timezone.utc)
+            event_date = event_date.replace(tzinfo=UTC)
 
         if cutoff <= event_date <= now:
             session_types = ["R", "Q"]

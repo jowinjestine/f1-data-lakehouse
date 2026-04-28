@@ -1,8 +1,7 @@
+import pandas as pd
 import pytest
 
-from jobs.ingest_recent.fastf1_client import _to_snake_case, _normalize_columns
-
-import pandas as pd
+from jobs.ingest_recent.fastf1_client import _normalize_columns, _to_snake_case
 
 
 @pytest.mark.unit

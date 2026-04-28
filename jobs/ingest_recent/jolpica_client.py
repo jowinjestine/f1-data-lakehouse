@@ -1,5 +1,6 @@
 import logging
 import time
+from datetime import UTC
 
 import pandas as pd
 from fastf1.ergast import Ergast
@@ -10,9 +11,9 @@ logger = logging.getLogger(__name__)
 
 
 def _add_metadata(df: pd.DataFrame) -> pd.DataFrame:
-    from datetime import datetime, timezone
+    from datetime import datetime
 
-    df["ingestion_timestamp"] = datetime.now(timezone.utc).isoformat()
+    df["ingestion_timestamp"] = datetime.now(UTC).isoformat()
     df["schema_version"] = SCHEMA_VERSION
     return df
 

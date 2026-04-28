@@ -1,6 +1,5 @@
 import os
-from datetime import datetime, timezone
-
+from datetime import UTC, datetime
 
 GCP_PROJECT = os.environ.get("GCP_PROJECT", "")
 RAW_BUCKET = os.environ.get("RAW_BUCKET", "")
@@ -12,4 +11,4 @@ SAMPLE_MODE = os.environ.get("SAMPLE_MODE", "false").lower() == "true"
 
 
 def generate_ingest_run_id() -> str:
-    return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    return datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")

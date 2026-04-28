@@ -32,6 +32,9 @@ dbt = [
     "dbt-bigquery>=1.8.0",
 ]
 
+[tool.setuptools.packages.find]
+include = ["jobs*", "tests*"]
+
 [tool.ruff]
 target-version = "py312"
 line-length = 120
