@@ -27,7 +27,10 @@ def _fetch_all_pages(result) -> pd.DataFrame:
     frames = [result.content[0]] if result.content and len(result.content[0]) > 0 else []
     while not result.is_complete:
         _rate_limit()
-        result = result.get_next_result_page()
+        try:
+            result = result.get_next_result_page()
+        except ValueError:
+            break
         if result.content and len(result.content[0]) > 0:
             frames.append(result.content[0])
     return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
