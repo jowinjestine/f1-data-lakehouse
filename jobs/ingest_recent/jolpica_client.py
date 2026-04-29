@@ -87,6 +87,11 @@ def fetch_constructor_standings(year: int, round_number: int | None = None) -> p
     return _add_metadata(df) if len(df) > 0 else df
 
 
+def _fetch_simple_response(result) -> pd.DataFrame:
+    df = result.reset_index(drop=True)
+    return df
+
+
 def fetch_drivers(year: int | None = None) -> pd.DataFrame:
     logger.info("Fetching Jolpica drivers for %s", year or "all")
     ergast = Ergast()
@@ -95,7 +100,7 @@ def fetch_drivers(year: int | None = None) -> pd.DataFrame:
         kwargs["season"] = year
     result = ergast.get_driver_info(**kwargs)
     _rate_limit()
-    df = _fetch_all_pages(result)
+    df = _fetch_simple_response(result)
     return _add_metadata(df) if len(df) > 0 else df
 
 
@@ -107,7 +112,7 @@ def fetch_constructors(year: int | None = None) -> pd.DataFrame:
         kwargs["season"] = year
     result = ergast.get_constructor_info(**kwargs)
     _rate_limit()
-    df = _fetch_all_pages(result)
+    df = _fetch_simple_response(result)
     return _add_metadata(df) if len(df) > 0 else df
 
 
@@ -119,5 +124,5 @@ def fetch_circuits(year: int | None = None) -> pd.DataFrame:
         kwargs["season"] = year
     result = ergast.get_circuits(**kwargs)
     _rate_limit()
-    df = _fetch_all_pages(result)
+    df = _fetch_simple_response(result)
     return _add_metadata(df) if len(df) > 0 else df

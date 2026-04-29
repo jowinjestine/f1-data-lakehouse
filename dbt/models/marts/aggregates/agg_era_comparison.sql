@@ -21,7 +21,7 @@ select
     count(distinct year) as seasons,
     count(*) as total_race_entries,
     avg(points) as avg_points_per_entry,
-    sum(countif(position = 1)) over (partition by era) / nullif(count(*), 0) as era_win_rate,
+    countif(position = 1) * 1.0 / nullif(count(*), 0) as era_win_rate,
     data_source
 from with_era
 where position is not null
