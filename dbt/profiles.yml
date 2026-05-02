@@ -1,0 +1,11 @@
+f1_lakehouse:
+  target: prod
+  outputs:
+    prod:
+      type: bigquery
+      method: oauth
+      project: "{{ env_var('GCP_PROJECT') }}"
+      dataset: analytics
+      threads: 4
+      timeout_seconds: 300
+      location: US
