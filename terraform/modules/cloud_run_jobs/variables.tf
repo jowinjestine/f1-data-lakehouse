@@ -26,3 +26,15 @@ variable "use_placeholder_image" {
   type    = bool
   default = true
 }
+
+variable "f1tv_email_secret_id" {
+  type = string
+}
+
+variable "f1tv_password_secret_id" {
+  type = string
+}
+
+variable "f1tv_token_secret_id" {
+  type = string
+}

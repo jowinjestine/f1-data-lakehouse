@@ -1,15 +1,19 @@
-output "ingest_job_name" {
-  value = google_cloud_run_v2_job.ingest_recent.name
+output "session_dispatcher_job_name" {
+  value = google_cloud_run_v2_job.session_dispatcher.name
 }
 
 output "dbt_runner_job_name" {
   value = google_cloud_run_v2_job.dbt_runner.name
 }
 
-output "backfill_jolpica_job_name" {
-  value = google_cloud_run_v2_job.backfill_jolpica.name
+output "openf1_live_job_name" {
+  value = google_cloud_run_v2_job.openf1_live.name
 }
 
-output "backfill_fastf1_job_name" {
-  value = google_cloud_run_v2_job.backfill_fastf1.name
+output "openf1_historical_job_name" {
+  value = google_cloud_run_v2_job.openf1_historical.name
+}
+
+output "parquet_exporter_job_name" {
+  value = google_cloud_run_v2_job.parquet_exporter.name
 }

@@ -6,10 +6,6 @@ terraform {
       source  = "hashicorp/google"
       version = "~> 5.0"
     }
-    time = {
-      source  = "hashicorp/time"
-      version = "~> 0.9"
-    }
   }
 }
 
@@ -46,6 +42,11 @@ module "cloud_run_jobs" {
   ingest_sa_email  = module.iam.ingest_sa_email
   dbt_sa_email     = module.iam.dbt_sa_email
   ar_repository_id = google_artifact_registry_repository.f1_images.repository_id
+
+  f1tv_email_secret_id    = google_secret_manager_secret.f1tv_email.secret_id
+  f1tv_password_secret_id = google_secret_manager_secret.f1tv_password.secret_id
+  f1tv_token_secret_id    = google_secret_manager_secret.f1tv_token.secret_id
+  use_placeholder_image   = var.use_placeholder_image
 }
 
 module "scheduler" {
@@ -53,16 +54,37 @@ module "scheduler" {
   project_id          = var.project_id
   region              = var.region
   scheduler_sa_email  = module.iam.scheduler_sa_email
-  ingest_job_name     = module.cloud_run_jobs.ingest_job_name
+  dispatcher_job_name = module.cloud_run_jobs.session_dispatcher_job_name
   dbt_runner_job_name = module.cloud_run_jobs.dbt_runner_job_name
 }
 
-module "monitoring" {
-  source          = "./modules/monitoring"
-  project_id      = var.project_id
-  alert_email     = var.alert_email
-  budget_amounts  = var.budget_amounts
-  billing_account = var.billing_account
+# ── Secret Manager: F1TV credentials (values set manually via gcloud) ────────
+
+resource "google_secret_manager_secret" "f1tv_email" {
+  secret_id = "f1tv-email"
+  project   = var.project_id
+
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret" "f1tv_password" {
+  secret_id = "f1tv-password"
+  project   = var.project_id
+
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret" "f1tv_token" {
+  secret_id = "f1tv-token"
+  project   = var.project_id
+
+  replication {
+    auto {}
+  }
 }
 
 resource "google_artifact_registry_repository" "f1_images" {
