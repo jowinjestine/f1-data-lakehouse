@@ -1,5 +1,7 @@
 import logging
+import os
 import re
+import tempfile
 from datetime import UTC, datetime
 
 import fastf1
@@ -45,7 +47,9 @@ def load_session_data(year: int, round_number: int, session_type: str) -> dict[s
     session_name = SESSION_MAP.get(session_type, session_type)
     logger.info("Loading FastF1 %s %d R%02d", session_name, year, round_number)
 
-    fastf1.Cache.enable_cache("/tmp/fastf1_cache")
+    cache_dir = os.environ.get("FASTF1_CACHE_DIR", os.path.join(tempfile.gettempdir(), "fastf1_cache"))
+    os.makedirs(cache_dir, exist_ok=True)
+    fastf1.Cache.enable_cache(cache_dir)
     session = fastf1.get_session(year, round_number, session_name)
     session.load()
 

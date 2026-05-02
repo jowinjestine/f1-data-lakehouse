@@ -23,6 +23,7 @@ select
     cast(round as int64) as round_number,
     session as session_type,
     cast(driver_number as string) as driver_number,
+    abbreviation as driver_abbreviation,
     cast(position as float64) as position,
     cast(points as float64) as points,
     status,

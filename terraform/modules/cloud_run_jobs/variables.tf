@@ -21,3 +21,8 @@ variable "dbt_sa_email" {
 variable "ar_repository_id" {
   type = string
 }
+
+variable "use_placeholder_image" {
+  type    = bool
+  default = true
+}

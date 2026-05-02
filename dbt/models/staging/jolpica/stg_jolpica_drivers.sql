@@ -4,8 +4,8 @@ select
     familyName as last_name,
     concat(givenName, ' ', familyName) as full_name,
     dateOfBirth as date_of_birth,
-    nationality,
-    code as driver_code,
-    permanentNumber as permanent_number,
+    driverNationality as nationality,
+    driverCode as driver_code,
+    driverNumber as permanent_number,
     ingestion_timestamp
 from {{ source('f1_raw', 'jolpica_drivers') }}

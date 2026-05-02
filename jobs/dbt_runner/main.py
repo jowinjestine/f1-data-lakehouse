@@ -11,11 +11,12 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 DBT_DIR = os.environ.get("DBT_DIR", "/app/dbt")
+PROFILES_DIR = os.environ.get("DBT_PROFILES_DIR", "/app/dbt")
 TARGET = os.environ.get("DBT_TARGET", "prod")
 
 
 def _run_dbt(command: list[str]) -> None:
-    full_cmd = ["dbt"] + command + ["--project-dir", DBT_DIR, "--target", TARGET]
+    full_cmd = ["dbt"] + command + ["--project-dir", DBT_DIR, "--profiles-dir", PROFILES_DIR, "--target", TARGET]
     logger.info("Running: %s", " ".join(full_cmd))
     result = subprocess.run(full_cmd, capture_output=True, text=True)
     if result.stdout:
@@ -30,7 +31,6 @@ def run() -> None:
 
     steps = [
         ["deps"],
-        ["run-operation", "stage_external_sources"],
         ["source", "freshness"],
         ["run"],
         ["test"],

@@ -54,12 +54,21 @@ sources:
             format: PARQUET
             hive_partition_uri_prefix: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=pitstops/"
 
-      - name: jolpica_standings
-        description: Jolpica driver/constructor standings
+      - name: jolpica_driver_standings
+        description: Jolpica driver standings by season
         external:
-          location: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=standings/*"
+          location: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=driver_standings/*"
           options:
             format: PARQUET
+            hive_partition_uri_prefix: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=driver_standings/"
+
+      - name: jolpica_constructor_standings
+        description: Jolpica constructor standings by season
+        external:
+          location: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=constructor_standings/*"
+          options:
+            format: PARQUET
+            hive_partition_uri_prefix: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=constructor_standings/"
 
       - name: jolpica_drivers
         description: Jolpica driver information
@@ -67,6 +76,7 @@ sources:
           location: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=drivers/*"
           options:
             format: PARQUET
+            hive_partition_uri_prefix: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=drivers/"
 
       - name: jolpica_constructors
         description: Jolpica constructor information
@@ -74,6 +84,7 @@ sources:
           location: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=constructors/*"
           options:
             format: PARQUET
+            hive_partition_uri_prefix: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=constructors/"
 
       - name: jolpica_circuits
         description: Jolpica circuit information
@@ -81,6 +92,7 @@ sources:
           location: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=circuits/*"
           options:
             format: PARQUET
+            hive_partition_uri_prefix: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=circuits/"
 
   - name: f1_ops
     database: "{{ env_var('GCP_PROJECT', '') }}"

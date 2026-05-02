@@ -49,7 +49,13 @@ resource "google_logging_metric" "cloud_run_job_failures" {
   }
 }
 
+resource "time_sleep" "wait_for_metric" {
+  depends_on      = [google_logging_metric.cloud_run_job_failures]
+  create_duration = "60s"
+}
+
 resource "google_monitoring_alert_policy" "job_failure" {
+  depends_on   = [time_sleep.wait_for_metric]
   display_name = "F1 Cloud Run Job Failure"
   project      = var.project_id
   combiner     = "OR"

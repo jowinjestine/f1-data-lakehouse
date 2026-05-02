@@ -4,6 +4,7 @@ with jolpica as (
         year,
         round_number,
         driver_id,
+        cast(null as string) as driver_abbreviation,
         constructor_id,
         position,
         points,
@@ -21,12 +22,13 @@ fastf1 as (
         year,
         round_number,
         driver_number as driver_id,
-        null as constructor_id,
+        driver_abbreviation,
+        cast(null as string) as constructor_id,
         cast(position as int64) as position,
         points,
         status,
-        null as grid_position,
-        null as laps_completed,
+        cast(null as int64) as grid_position,
+        cast(null as int64) as laps_completed,
         'fastf1' as data_source
     from {{ ref('stg_results') }}
     where session_type = 'R'
@@ -41,13 +43,17 @@ combined as (
 with_dims as (
     select
         c.*,
-        dd.driver_key,
-        dd.full_name as driver_name,
+        coalesce(dd_jolpica.driver_key, dd_fastf1.driver_key) as driver_key,
+        coalesce(dd_jolpica.full_name, dd_fastf1.full_name) as driver_name,
         dc.constructor_key,
         dc.constructor_name
     from combined c
-    left join {{ ref('dim_drivers') }} dd
-        on c.driver_id = dd.jolpica_driver_id
+    left join {{ ref('dim_drivers') }} dd_jolpica
+        on c.data_source = 'jolpica'
+        and c.driver_id = dd_jolpica.jolpica_driver_id
+    left join {{ ref('dim_drivers') }} dd_fastf1
+        on c.data_source = 'fastf1'
+        and c.driver_abbreviation = dd_fastf1.driver_code
     left join {{ ref('dim_constructors') }} dc
         on c.constructor_id = dc.jolpica_constructor_id
 )

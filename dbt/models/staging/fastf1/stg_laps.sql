@@ -23,6 +23,7 @@ select
     cast(round as int64) as round_number,
     session as session_type,
     cast(driver_number as string) as driver_number,
+    driver as driver_abbreviation,
     cast(lap_number as int64) as lap_number,
     cast(lap_time as float64) as lap_time_seconds,
     cast(sector1_time as float64) as sector1_seconds,

@@ -4,6 +4,6 @@ select
     locality as city,
     country,
     cast(lat as float64) as latitude,
-    cast(lng as float64) as longitude,
+    cast(`long` as float64) as longitude,
     ingestion_timestamp
 from {{ source('f1_raw', 'jolpica_circuits') }}
