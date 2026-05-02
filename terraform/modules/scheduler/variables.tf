@@ -10,7 +10,7 @@ variable "scheduler_sa_email" {
   type = string
 }
 
-variable "ingest_job_name" {
+variable "dispatcher_job_name" {
   type = string
 }
 
