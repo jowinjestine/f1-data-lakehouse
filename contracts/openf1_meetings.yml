@@ -1,0 +1,7 @@
+required_columns:
+  - name: _key
+    type: STRING
+  - name: _id
+    type: INT64
+  - name: meeting_key
+    type: INT64

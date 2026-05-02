@@ -1,0 +1,17 @@
+required_columns:
+  - name: _key
+    type: STRING
+  - name: _id
+    type: INT64
+  - name: session_key
+    type: INT64
+  - name: meeting_key
+    type: INT64
+  - name: driver_number
+    type: INT64
+  - name: stint_number
+    type: INT64
+  - name: lap_start
+    type: INT64
+  - name: lap_end
+    type: INT64

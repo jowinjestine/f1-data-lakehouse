@@ -1,36 +1,6 @@
 version: 2
 
 seeds:
-  - name: driver_crosswalk
-    description: Maps driver identifiers across FastF1 and Jolpica sources
-    columns:
-      - name: source
-        tests: [not_null]
-      - name: source_id
-        tests: [not_null]
-      - name: normalized_id
-        tests: [not_null]
-
-  - name: constructor_crosswalk
-    description: Maps constructor identifiers across sources (handles name changes)
-    columns:
-      - name: source
-        tests: [not_null]
-      - name: source_id
-        tests: [not_null]
-      - name: normalized_id
-        tests: [not_null]
-
-  - name: circuit_crosswalk
-    description: Maps circuit identifiers across sources
-    columns:
-      - name: source
-        tests: [not_null]
-      - name: source_id
-        tests: [not_null]
-      - name: normalized_id
-        tests: [not_null]
-
   - name: team_colors
     description: F1 team hex colors for dashboard visualizations
     columns:

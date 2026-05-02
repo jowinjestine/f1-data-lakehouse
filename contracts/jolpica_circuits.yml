@@ -1,9 +1,0 @@
-name: jolpica_circuits
-source: jolpica
-dataset: circuits
-schema_version: "1.0"
-required_columns:
-  - name: circuitId
-    type: string
-  - name: circuitName
-    type: string

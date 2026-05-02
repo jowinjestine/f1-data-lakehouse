@@ -1,61 +1,71 @@
-with jolpica as (
-    select
-        result_id,
-        year,
-        round_number,
-        driver_id,
-        cast(null as string) as driver_abbreviation,
-        constructor_id,
-        position,
-        points,
-        status,
-        grid_position,
-        laps_completed,
-        'jolpica' as data_source
-    from {{ ref('stg_jolpica_results') }}
-    where year < 2018
+with race_sessions as (
+    select session_key, meeting_key, season_year, circuit_short_name
+    from {{ ref('stg_openf1_sessions') }}
+    where lower(session_type) = 'race'
+      and not is_cancelled
 ),
 
-fastf1 as (
+final_positions as (
     select
-        result_id,
-        year,
-        round_number,
-        driver_number as driver_id,
-        driver_abbreviation,
-        cast(null as string) as constructor_id,
-        cast(position as int64) as position,
-        points,
-        status,
-        cast(null as int64) as grid_position,
-        cast(null as int64) as laps_completed,
-        'fastf1' as data_source
-    from {{ ref('stg_results') }}
-    where session_type = 'R'
+        session_key,
+        driver_number,
+        race_position as finish_position,
+        row_number() over (
+            partition by session_key, driver_number
+            order by recorded_at desc
+        ) as rn
+    from {{ ref('stg_openf1_position') }}
 ),
 
-combined as (
-    select * from jolpica
-    union all
-    select * from fastf1
+laps_completed as (
+    select
+        session_key,
+        driver_number,
+        max(lap_number) as total_laps,
+        sum(lap_time_seconds) as total_race_time_seconds
+    from {{ ref('stg_openf1_laps') }}
+    group by session_key, driver_number
 ),
 
-with_dims as (
+points_gained as (
     select
-        c.*,
-        coalesce(dd_jolpica.driver_key, dd_fastf1.driver_key) as driver_key,
-        coalesce(dd_jolpica.full_name, dd_fastf1.full_name) as driver_name,
-        dc.constructor_key,
-        dc.constructor_name
-    from combined c
-    left join {{ ref('dim_drivers') }} dd_jolpica
-        on c.data_source = 'jolpica'
-        and c.driver_id = dd_jolpica.jolpica_driver_id
-    left join {{ ref('dim_drivers') }} dd_fastf1
-        on c.data_source = 'fastf1'
-        and c.driver_abbreviation = dd_fastf1.driver_code
-    left join {{ ref('dim_constructors') }} dc
-        on c.constructor_id = dc.jolpica_constructor_id
+        session_key,
+        driver_number,
+        points_current - coalesce(points_start, 0) as session_points
+    from {{ ref('stg_openf1_championship_drivers') }}
+),
+
+drivers as (
+    select session_key, driver_number, full_name, name_acronym, team_name
+    from {{ ref('stg_openf1_drivers') }}
 )
 
-select * from with_dims
+select
+    {{ dbt_utils.generate_surrogate_key(['rs.session_key', 'fp.driver_number']) }} as result_id,
+    rs.season_year as year,
+    rs.meeting_key,
+    rs.session_key,
+    rs.circuit_short_name,
+    fp.driver_number,
+    d.full_name as driver_name,
+    d.name_acronym as driver_code,
+    d.team_name,
+    fp.finish_position,
+    coalesce(pg.session_points, 0) as points,
+    lc.total_laps as laps_completed,
+    lc.total_race_time_seconds,
+    fp.finish_position = 1 as is_winner,
+    fp.finish_position <= 3 as is_podium
+from race_sessions rs
+inner join final_positions fp
+    on rs.session_key = fp.session_key
+    and fp.rn = 1
+left join laps_completed lc
+    on rs.session_key = lc.session_key
+    and fp.driver_number = lc.driver_number
+left join points_gained pg
+    on rs.session_key = pg.session_key
+    and fp.driver_number = pg.driver_number
+left join drivers d
+    on rs.session_key = d.session_key
+    and fp.driver_number = d.driver_number

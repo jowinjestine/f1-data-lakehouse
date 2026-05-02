@@ -1,106 +1,49 @@
 version: 2
 
 sources:
-  - name: f1_raw
+  - name: f1_streaming
     database: "{{ env_var('GCP_PROJECT', '') }}"
-    schema: f1_raw
-    description: External tables over raw GCS Parquet files
+    schema: f1_streaming
+    description: OpenF1 live timing data — native BigQuery tables (2023+)
     tables:
-      - name: fastf1_laps
-        description: FastF1 lap timing data (2018+)
-        external:
-          location: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=fastf1/dataset=laps/*"
-          options:
-            format: PARQUET
-            hive_partition_uri_prefix: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=fastf1/dataset=laps/"
-
-      - name: fastf1_results
-        description: FastF1 session results (2018+)
-        external:
-          location: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=fastf1/dataset=results/*"
-          options:
-            format: PARQUET
-            hive_partition_uri_prefix: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=fastf1/dataset=results/"
-
-      - name: fastf1_weather
-        description: FastF1 weather data (2018+)
-        external:
-          location: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=fastf1/dataset=weather/*"
-          options:
-            format: PARQUET
-            hive_partition_uri_prefix: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=fastf1/dataset=weather/"
-
-      - name: jolpica_results
-        description: Jolpica race results (1950+)
-        external:
-          location: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=results/*"
-          options:
-            format: PARQUET
-            hive_partition_uri_prefix: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=results/"
-
-      - name: jolpica_qualifying
-        description: Jolpica qualifying results (2003+)
-        external:
-          location: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=qualifying/*"
-          options:
-            format: PARQUET
-            hive_partition_uri_prefix: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=qualifying/"
-
-      - name: jolpica_pitstops
-        description: Jolpica pit stop data (2011+)
-        external:
-          location: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=pitstops/*"
-          options:
-            format: PARQUET
-            hive_partition_uri_prefix: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=pitstops/"
-
-      - name: jolpica_driver_standings
-        description: Jolpica driver standings by season
-        external:
-          location: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=driver_standings/*"
-          options:
-            format: PARQUET
-            hive_partition_uri_prefix: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=driver_standings/"
-
-      - name: jolpica_constructor_standings
-        description: Jolpica constructor standings by season
-        external:
-          location: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=constructor_standings/*"
-          options:
-            format: PARQUET
-            hive_partition_uri_prefix: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=constructor_standings/"
-
-      - name: jolpica_drivers
-        description: Jolpica driver information
-        external:
-          location: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=drivers/*"
-          options:
-            format: PARQUET
-            hive_partition_uri_prefix: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=drivers/"
-
-      - name: jolpica_constructors
-        description: Jolpica constructor information
-        external:
-          location: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=constructors/*"
-          options:
-            format: PARQUET
-            hive_partition_uri_prefix: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=constructors/"
-
-      - name: jolpica_circuits
-        description: Jolpica circuit information
-        external:
-          location: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=circuits/*"
-          options:
-            format: PARQUET
-            hive_partition_uri_prefix: "gs://{{ env_var('RAW_BUCKET', '') }}/raw/source=jolpica/dataset=circuits/"
+      - name: car_data
+        description: Car telemetry (RPM, speed, gear, throttle, brake, DRS)
+      - name: location
+        description: Car GPS position (x, y, z track coordinates)
+      - name: laps
+        description: Lap timing with sector durations and segment status
+      - name: stints
+        description: Tyre stints with compound and lap ranges
+      - name: weather
+        description: Track weather conditions
+      - name: position
+        description: Driver race position over time
+      - name: intervals
+        description: Gap to leader and interval to car ahead
+      - name: pit
+        description: Pit stop events with lane and stop durations
+      - name: race_control
+        description: Race control messages, flags, penalties, session status
+      - name: team_radio
+        description: Team radio recording URLs
+      - name: drivers
+        description: Driver information per session
+      - name: sessions
+        description: Session metadata (times, circuit, location)
+      - name: meetings
+        description: Meeting/event metadata
+      - name: championship_drivers
+        description: Live driver championship standings predictions
+      - name: championship_teams
+        description: Live team championship standings predictions
+      - name: overtakes
+        description: Overtake events detected from timing data
 
   - name: f1_ops
     database: "{{ env_var('GCP_PROJECT', '') }}"
     schema: f1_ops
     description: Operational metadata tables
     tables:
-      - name: latest_successful_objects
-        description: Latest successful ingest per data slice
       - name: ingest_runs
         description: Ingest run metadata
       - name: ingest_objects

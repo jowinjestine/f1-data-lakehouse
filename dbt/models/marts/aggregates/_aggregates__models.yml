@@ -2,16 +2,19 @@ version: 2
 
 models:
   - name: agg_season_standings
-    description: Season standings with cumulative points and normalized metrics
+    description: Season standings with points, wins, podiums per driver per year
 
-  - name: agg_constructor_standings
-    description: Constructor championship standings by season
+  - name: agg_team_standings
+    description: Team championship standings by season
 
   - name: agg_career_stats
-    description: Career statistics per driver (wins, poles, podiums, points_share, wins_per_start)
+    description: Career statistics per driver (wins, poles, podiums, win rate)
 
   - name: agg_era_comparison
-    description: Aggregate statistics by F1 era (1950-70, 71-93, 94-2013, 14-21, 22+)
+    description: Year-over-year aggregate statistics (2023+)
 
   - name: agg_head_to_head
-    description: Teammate comparison within same constructor per season
+    description: Teammate head-to-head comparison within same team per season
+
+  - name: agg_tyre_strategy
+    description: Tyre strategy breakdown per driver per race with stint-level detail

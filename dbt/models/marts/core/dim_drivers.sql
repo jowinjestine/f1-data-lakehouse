@@ -1,22 +1,34 @@
-with jolpica_drivers as (
-    select * from {{ ref('stg_jolpica_drivers') }}
-),
-
-crosswalk as (
-    select * from {{ ref('driver_crosswalk') }}
+with latest_session_per_driver as (
+    select
+        driver_number,
+        full_name,
+        first_name,
+        last_name,
+        broadcast_name,
+        name_acronym,
+        team_name,
+        team_colour,
+        headshot_url,
+        country_code,
+        row_number() over (
+            partition by driver_number
+            order by session_key desc
+        ) as rn
+    from {{ ref('stg_openf1_drivers') }}
+    where driver_number is not null
 )
 
 select
-    coalesce(cw.normalized_id, jd.driver_id) as driver_key,
-    jd.driver_id as jolpica_driver_id,
-    jd.first_name,
-    jd.last_name,
-    jd.full_name,
-    jd.date_of_birth,
-    jd.nationality,
-    coalesce(cw.abbreviation, jd.driver_code) as driver_code,
-    jd.permanent_number
-from jolpica_drivers jd
-left join crosswalk cw
-    on cw.source = 'jolpica'
-    and cw.source_id = jd.driver_id
+    driver_number as driver_key,
+    driver_number,
+    full_name,
+    first_name,
+    last_name,
+    broadcast_name,
+    name_acronym as driver_code,
+    team_name as current_team,
+    team_colour as current_team_colour,
+    headshot_url,
+    country_code
+from latest_session_per_driver
+where rn = 1

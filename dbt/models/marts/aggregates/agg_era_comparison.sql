@@ -1,29 +1,18 @@
 with results as (
     select * from {{ ref('fct_race_results') }}
-),
-
-with_era as (
-    select
-        *,
-        case
-            when year between 1950 and 1970 then '1950-70'
-            when year between 1971 and 1993 then '1971-93'
-            when year between 1994 and 2013 then '1994-2013'
-            when year between 2014 and 2021 then '2014-21'
-            when year >= 2022 then '2022+'
-        end as era
-    from results
+    where finish_position is not null
 )
 
 select
-    era,
-    count(distinct driver_key) as unique_drivers,
-    count(distinct year) as seasons,
+    year,
+    count(distinct driver_number) as unique_drivers,
+    count(distinct team_name) as unique_teams,
+    count(distinct circuit_short_name) as unique_circuits,
     count(*) as total_race_entries,
     avg(points) as avg_points_per_entry,
-    countif(position = 1) * 1.0 / nullif(count(*), 0) as era_win_rate,
-    data_source
-from with_era
-where position is not null
-group by era, data_source
-order by era
+    countif(is_winner) * 1.0 / nullif(count(*), 0) as win_rate,
+    avg(finish_position) as avg_finish_position,
+    sum(points) as total_season_points
+from results
+group by year
+order by year
