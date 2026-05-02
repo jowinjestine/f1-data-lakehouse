@@ -9,10 +9,31 @@ with laps as (
         on l.session_key = s.session_key
 ),
 
+stint_matched as (
+    select
+        l.session_key,
+        l.driver_number,
+        l.lap_number,
+        st.tyre_compound,
+        st.tyre_age_at_start,
+        st.stint_number,
+        st.lap_start,
+        row_number() over (
+            partition by l.session_key, l.driver_number, l.lap_number
+            order by st.stint_number desc
+        ) as _rn
+    from {{ ref('stg_openf1_laps') }} l
+    inner join {{ ref('stg_openf1_stints') }} st
+        on l.session_key = st.session_key
+        and l.driver_number = st.driver_number
+        and l.lap_number between st.lap_start and st.lap_end
+),
+
 stint_info as (
-    select session_key, driver_number, lap_start, lap_end,
-           tyre_compound, tyre_age_at_start, stint_number
-    from {{ ref('stg_openf1_stints') }}
+    select session_key, driver_number, lap_number,
+           tyre_compound, tyre_age_at_start, stint_number, lap_start
+    from stint_matched
+    where _rn = 1
 ),
 
 session_weather as (
@@ -62,7 +83,7 @@ from laps
 left join stint_info si
     on laps.session_key = si.session_key
     and laps.driver_number = si.driver_number
-    and laps.lap_number between si.lap_start and si.lap_end
+    and laps.lap_number = si.lap_number
 left join session_weather sw on laps.session_key = sw.session_key
 left join drivers d
     on laps.session_key = d.session_key
