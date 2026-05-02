@@ -1,10 +1,12 @@
 name: Deploy
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       job_to_run:
-        description: "Job to trigger manually (backfill_jolpica, backfill_fastf1, or leave empty for full deploy)"
+        description: "Job to trigger manually (openf1-historical, parquet-exporter, or leave empty for full deploy)"
         required: false
         type: string
 
@@ -24,6 +26,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - id: auth
         uses: google-github-actions/auth@v2
@@ -42,28 +46,35 @@ jobs:
 
       - name: Terraform apply
         run: cd terraform && terraform apply -auto-approve
-        if: github.event_name == 'push'
 
-      - name: Build and push ingest-recent image
+      - name: Build and push openf1 image
         run: |
           gcloud builds submit \
-            --tag ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO }}/ingest-recent:latest \
+            --tag ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO }}/openf1:latest \
             --project ${{ env.PROJECT_ID }} \
-            jobs/ingest_recent/
+            openf1_upstream/
 
-      - name: Build and push backfill-jolpica image
+      - name: Build and push parquet-exporter image
         run: |
           gcloud builds submit \
-            --tag ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO }}/backfill-jolpica:latest \
+            --tag ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO }}/parquet-exporter:latest \
             --project ${{ env.PROJECT_ID }} \
-            jobs/backfill_jolpica/
+            jobs/parquet_exporter/
+
+      - name: Build and push session-dispatcher image
+        run: |
+          gcloud builds submit \
+            --tag ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO }}/session-dispatcher:latest \
+            --project ${{ env.PROJECT_ID }} \
+            jobs/session_dispatcher/
 
       - name: Build and push dbt-runner image
         run: |
           gcloud builds submit \
-            --tag ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO }}/dbt-runner:latest \
+            --config jobs/dbt_runner/cloudbuild.yaml \
+            --substitutions _IMAGE=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO }}/dbt-runner:latest \
             --project ${{ env.PROJECT_ID }} \
-            jobs/dbt_runner/
+            .
 
   manual-job:
     runs-on: ubuntu-latest
@@ -79,7 +90,7 @@ jobs:
 
       - name: Trigger Cloud Run Job
         run: |
-          gcloud run jobs execute f1-${{ github.event.inputs.job_to_run }} \
+          gcloud run jobs execute ${{ github.event.inputs.job_to_run }} \
             --region ${{ env.REGION }} \
             --project ${{ env.PROJECT_ID }} \
             --wait
