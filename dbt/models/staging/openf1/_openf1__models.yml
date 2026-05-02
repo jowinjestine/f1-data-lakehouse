@@ -1,0 +1,179 @@
+version: 2
+
+models:
+  - name: stg_openf1_laps
+    description: Deduplicated lap timing data with sector durations and segment status
+    columns:
+      - name: lap_id
+        description: Surrogate key (session_key + driver_number + lap_number)
+        tests: [unique, not_null]
+      - name: session_key
+        tests: [not_null]
+      - name: driver_number
+        tests: [not_null]
+      - name: lap_number
+        tests: [not_null]
+      - name: lap_time_seconds
+        description: Total lap time in seconds (may be inferred from sector sums)
+
+  - name: stg_openf1_car_data
+    description: Deduplicated car telemetry — RPM, speed, gear, throttle, brake, DRS
+    columns:
+      - name: telemetry_id
+        tests: [unique, not_null]
+      - name: session_key
+        tests: [not_null]
+      - name: driver_number
+        tests: [not_null]
+      - name: recorded_at
+        tests: [not_null]
+
+  - name: stg_openf1_location
+    description: Deduplicated car GPS coordinates on track
+    columns:
+      - name: location_id
+        tests: [unique, not_null]
+      - name: session_key
+        tests: [not_null]
+      - name: driver_number
+        tests: [not_null]
+
+  - name: stg_openf1_weather
+    description: Deduplicated track weather with cardinal wind direction
+    columns:
+      - name: weather_id
+        tests: [unique, not_null]
+      - name: session_key
+        tests: [not_null]
+      - name: wind_cardinal
+        tests:
+          - accepted_values:
+              values: ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
+
+  - name: stg_openf1_stints
+    description: Deduplicated tyre stints with compound and lap range
+    columns:
+      - name: stint_id
+        tests: [unique, not_null]
+      - name: session_key
+        tests: [not_null]
+      - name: driver_number
+        tests: [not_null]
+      - name: tyre_compound
+        description: Tyre compound (SOFT, MEDIUM, HARD, INTERMEDIATE, WET, UNKNOWN, TEST_UNKNOWN)
+
+  - name: stg_openf1_position
+    description: Deduplicated race position changes over time
+    columns:
+      - name: position_id
+        tests: [unique, not_null]
+      - name: session_key
+        tests: [not_null]
+      - name: driver_number
+        tests: [not_null]
+      - name: race_position
+        tests: [not_null]
+
+  - name: stg_openf1_intervals
+    description: Deduplicated gap to leader and interval to car ahead
+    columns:
+      - name: interval_id
+        tests: [unique, not_null]
+      - name: session_key
+        tests: [not_null]
+      - name: driver_number
+        tests: [not_null]
+      - name: gap_to_leader_seconds
+        description: Numeric gap in seconds (null when lapped — see gap_to_leader_raw)
+
+  - name: stg_openf1_pit
+    description: Deduplicated pit stop events with timing breakdown
+    columns:
+      - name: pit_stop_id
+        tests: [unique, not_null]
+      - name: session_key
+        tests: [not_null]
+      - name: driver_number
+        tests: [not_null]
+      - name: lap_number
+        tests: [not_null]
+
+  - name: stg_openf1_race_control
+    description: Deduplicated race control messages, flags, and session status events
+    columns:
+      - name: race_control_id
+        tests: [unique, not_null]
+      - name: session_key
+        tests: [not_null]
+
+  - name: stg_openf1_drivers
+    description: Deduplicated driver info per session (name, team, headshot)
+    columns:
+      - name: driver_session_id
+        tests: [unique, not_null]
+      - name: session_key
+        tests: [not_null]
+      - name: driver_number
+        tests: [not_null]
+
+  - name: stg_openf1_sessions
+    description: Deduplicated session metadata (times, circuit, location)
+    columns:
+      - name: session_key
+        tests: [unique, not_null]
+      - name: meeting_key
+        tests: [not_null]
+      - name: session_type
+        tests:
+          - accepted_values:
+              values: ['Practice', 'Qualifying', 'Race', 'Sprint', 'Sprint Qualifying', 'Sprint Shootout']
+
+  - name: stg_openf1_meetings
+    description: Deduplicated meeting/event metadata
+    columns:
+      - name: meeting_key
+        tests: [unique, not_null]
+      - name: season_year
+        tests: [not_null]
+
+  - name: stg_openf1_team_radio
+    description: Deduplicated team radio recording references
+    columns:
+      - name: radio_id
+        tests: [unique, not_null]
+      - name: session_key
+        tests: [not_null]
+      - name: driver_number
+        tests: [not_null]
+      - name: recording_url
+        tests: [not_null]
+
+  - name: stg_openf1_championship_drivers
+    description: Deduplicated live driver championship predictions per session
+    columns:
+      - name: championship_driver_id
+        tests: [unique, not_null]
+      - name: session_key
+        tests: [not_null]
+      - name: driver_number
+        tests: [not_null]
+
+  - name: stg_openf1_championship_teams
+    description: Deduplicated live team championship predictions per session
+    columns:
+      - name: championship_team_id
+        tests: [unique, not_null]
+      - name: session_key
+        tests: [not_null]
+
+  - name: stg_openf1_overtakes
+    description: Deduplicated overtake events detected from timing data
+    columns:
+      - name: overtake_id
+        tests: [unique, not_null]
+      - name: session_key
+        tests: [not_null]
+      - name: overtaking_driver_number
+        tests: [not_null]
+      - name: overtaken_driver_number
+        tests: [not_null]

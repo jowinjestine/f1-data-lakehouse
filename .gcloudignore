@@ -6,6 +6,7 @@ venv/
 __pycache__/
 *.pyc
 .terraform/
+terraform/
 *.tfstate
 *.tfstate.*
 .env
@@ -17,3 +18,7 @@ docs/
 Makefile
 graphify-out/
 fastf1_cache/
+openf1_upstream/
+.playwright-mcp/
+contracts/
+.ruff_cache/

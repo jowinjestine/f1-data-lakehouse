@@ -1,9 +1,0 @@
-name: jolpica_constructors
-source: jolpica
-dataset: constructors
-schema_version: "1.0"
-required_columns:
-  - name: constructorId
-    type: string
-  - name: name
-    type: string

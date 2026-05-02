@@ -13,3 +13,7 @@ output "analytics_dataset_id" {
 output "ops_dataset_id" {
   value = google_bigquery_dataset.ops.dataset_id
 }
+
+output "streaming_dataset_id" {
+  value = google_bigquery_dataset.streaming.dataset_id
+}
